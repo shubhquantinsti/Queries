@@ -1,0 +1,55 @@
+
+	
+	Query_question_is : to fetch the count of unique users, according to their percentage of video watched.
+
+	Query : db.quantravid.aggregate(
+		           [
+		             {$match : {percentage : {$in : [10,20,30,40,50,60,70,80,90,100]}}},
+		             {$group: {_id: {'courseId':'$courseId','sectionId':'$sectionId','unitId':'$unitId','%_complete':'$percentage'}, uniqueUserID: {$addToSet:'$userId'}}},
+		             {$project : {"count": {$size: "$uniqueUserID"}} },
+		             {$sort : {_id : 1}}
+		          ]
+		        )
+
+
+        --------------------------------------------------------------------------
+
+	
+	Query_question_is : to fetch the count of wrong option selected and to find the count of the unique correct option selected by the users.
+
+	Query : for wrong - db.quantraquiz.aggregate(
+						[
+						     {$match : { 'data.isOptionCorrect' : false }},
+						     {$group: {_id: {'courseId':'$courseId','sectionId':'$sectionId','unitId':'$unitId'},notuniqueUserID: {$sum:1}}},
+						     {$project : {"count_wrong_total": "$notuniqueUserID"}},
+						     {$sort : {_id : 1}}
+						 ]
+					)
+
+
+               for correct - db.quantraquiz.aggregate(
+						 [
+						      {$match : { 'data.isOptionCorrect' : true }},
+						      {$group: {_id: {'courseId':'$courseId','sectionId':'$sectionId','unitId':'$unitId'},uniqueUserID: {$addToSet:'$userId'}}},
+						      {$project : {"count_correct_unique": {$size: "$uniqueUserID"}} },
+						      {$sort : {_id : 1}}
+						 ]
+					)
+
+
+        --------------------------------------------------------------------------
+
+
+	
+
+	Query_question_is :  to fetch the data regarding the count of unique users, according to their video configuration type.
+
+	Query : db.quantravid.aggregate(
+                            [
+                                {$match : { 'config.isPlaying' : true }},
+                                {$group : { _id : {'Playback_rate' : '$config.playbackRate','Full_screne' : '$config.isFullscreen','subtitle' : '$config.subtitle','muted' : '$config.isMuted','playing' : 																			'$config.isPlaying'},uniqueUserID: {$addToSet:'$userId'}}},
+                                {$project : {"count_correct_unique": {$size: "$uniqueUserID"}}},
+                                {$sort : {'count_correct_unique' : -1}}
+                            ]
+                        )
+
