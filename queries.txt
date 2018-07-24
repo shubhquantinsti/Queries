@@ -53,3 +53,22 @@
                             ]
                         )
 
+
+        --------------------------------------------------------------------------
+
+
+
+
+	Query_question_is :  to fetch the time of the event types by respective users.
+
+
+
+	Query :	db.quantraunit.aggregate(
+				 [
+
+				     {$sort : {'createdAt': 1}},
+				     {$group: {_id: {'courseId':'$courseId','sectionId':'$sectionId','unitId':'$unitId'},dates :{$push : '$createdAt'},eventTypes : {$push : '$eventType'},users : {$push : '$userId'}}},
+				     {$project : {'dates': 1,'eventTypes':1,'users':1}},
+				     {$sort : {_id:1,users:1}}
+				 ]
+				     )
